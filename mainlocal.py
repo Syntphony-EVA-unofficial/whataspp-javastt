@@ -33,7 +33,7 @@ def test_endpoint():
 @app.post("/transcript", response_model=TranscriptResponse)
 async def transcript_request(request: Request):
     try:
-        logging.info(f"Request received" , request.json())
+        logging.info("Request received")
         data = await request.json()
         try:
             transcript_request = TranscriptRequest(**data)
