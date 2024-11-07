@@ -33,8 +33,8 @@ def test_endpoint():
 @app.post("/transcript", response_model=TranscriptResponse)
 async def transcript_request(request: Request):
     try:
-        logging.info(f"Request received" , request.json())
         data = await request.json()
+        logging.info("Request received {data}")
         try:
             transcript_request = TranscriptRequest(**data)
             logging.info(f"transcript incoming data: {json.dumps(data, indent=4)}")
@@ -42,19 +42,19 @@ async def transcript_request(request: Request):
             if transcript_request.mediaURL:
                 downloadAudio = await AudioSTT.getDownloadAudio(transcript_request.mediaURL, transcript_request.token)
                 if downloadAudio:
-                    logging.info(f"Audio message downloaded successfully")
+                    logging.info("Audio message downloaded successfully")
                     if isinstance(downloadAudio, bytes):
                         logging.info(f"The size of the binary data is {len(downloadAudio)} bytes")
-                        STT_Result = await AudioSTT.transcribe_file_v2(os.getenv("STT_PROJECT_NAME"), downloadAudio)
+                        STT_Result = await AudioSTT.transcribe_file(downloadAudio)
                         if STT_Result:
                             return JSONResponse(
                                 status_code=200,
-                                content=TranscriptResponse(lang="en", message=STT_Result, success=True).model_dump()
+                                content=TranscriptResponse(lang="ms", message=STT_Result, success=True).model_dump()
                             )
                         else:
                             return JSONResponse(
                                 status_code=200,
-                                content=TranscriptResponse(lang="en", message="", success=False).model_dump()
+                                content=TranscriptResponse(lang="ms", message="", success=False).model_dump()
                             )
         except Exception as e:
             logging.error(f"Error processing request: {str(e)}")
